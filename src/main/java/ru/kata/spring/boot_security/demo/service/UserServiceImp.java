@@ -60,6 +60,7 @@ public class UserServiceImp implements UserService {
     @Transactional
     @Override
     public void addFirstAdmin() {
+
         if (userDao.ifDBEmpty()) {
             User admin = new User("admin","adminsky","admin@mail.ru");
             admin.setPassword(passwordEncoder.encode("123"));
