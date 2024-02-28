@@ -1,6 +1,7 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.models.User;
@@ -39,8 +40,13 @@ public class UserController {
     }
 
     @GetMapping("/admin")
-    public String printUsers(ModelMap model) {
-        model.addAttribute( "allUsers", userService.listUsers() );
+    public String printUsers(@ModelAttribute("user") User user, ModelMap model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User signedUser = (User) authentication.getPrincipal();
+        model.addAttribute( "allUsers", userService.listUsers());
+        model.addAttribute("signedUser", signedUser);
+        model.addAttribute( "allRoles", roleService.rolesSet());
+        model.addAttribute( "roleSelect", new ArrayList<Long>());
         return "admin";
     }
 
@@ -83,7 +89,6 @@ public class UserController {
         return "/admin/changeForm";
     }
 
-    @PatchMapping("/admin/change")
     public String update(@RequestParam (required = false) List<Long> roleSelectedID, @ModelAttribute("user") User changedUser) {
         for(Long roleIdFromFront: roleSelectedID){
             changedUser.setRoles(roleService.findRole(roleIdFromFront));
