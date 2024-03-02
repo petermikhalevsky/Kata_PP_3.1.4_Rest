@@ -6,16 +6,11 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
     <!-- Bootstrap CSS -->
     <link type="text/css" rel="stylesheet" href="style.css"/>
-    <!--    <link rel="stylesheet" th:href="@{/style.css}" />-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
-
-
 </head>
 
 <body>
@@ -25,12 +20,9 @@
     <div class="container-fluid" style="background-color: #343A40">
         <div class="row justify-content-between">
             <div class="px-3 py-2 col-md-6">
-                <strong class="align-content-center" style="background-color: transparent; color: rgb(251,251,251); font-size: 22px" th:text="${signedUser.getEmail()}"></strong>
+                <strong class="align-content-center" style="background-color: transparent; color: rgb(251,251,251); font-size: 22px" id="headerEmail"></strong>
                 <span class="align-content-center" style="background-color: transparent; color: rgb(251,251,251); font-size: 22px">with roles: </span>
-                <th:block th:each="role:${signedUser.getRoles()}">
-                    <span class="align-content-center" style="background-color: transparent; color: rgb(251,251,251); font-size: 22px" th:text="${role}"></span>
-                    <span class="align-content-center" style="background-color: transparent; color: rgb(251,251,251); font-size: 22px"> </span>
-                </th:block>
+                <block id="headerRoles" style="background-color: transparent; color: rgb(251,251,251); font-size: 22px"></block>
             </div>
             <form class="col-md-1" th:action="@{/logout}" th:method = "POST">
                 <input type = "submit" class="d-xl-flex p-2 justify-content-end" style="border: transparent; background-color: transparent; font-size: 20px; color: rgb(154,149,135);" value = "Logout" />
@@ -92,35 +84,25 @@
                                         <h1 style="font-size: 4px"></h1>
                                         <thead>
                                         <tr>
-                                            <th>ID</th>
-                                            <th>Login</th>
-                                            <th>First Name</th>
-                                            <th>Last Name</th>
-                                            <th>Email</th>
-                                            <th>Role</th>
-                                            <th>Edit</th>
-                                            <th>Delete</th>
+                                            <th scope="col">ID</th>
+                                            <th scope="col">Login</th>
+                                            <th scope="col">First name</th>
+                                            <th scope="col">Last name</th>
+                                            <th scope="col">Email</th>
+                                            <th scope="col">Role</th>
+                                            <th scope="col">Edit</th>
+                                            <th scope="col">Delete</th>
                                         </tr>
                                         </thead>
-                                        <tbody>
-                                        <tr th:each="user : ${allUsers}">
-                                            <td th:text="${user.id}"></td>
-                                            <td th:text="${user.login}"></td>
-                                            <td th:text="${user.firstName}"></td>
-                                            <td th:text="${user.lastName}"></td>
-                                            <td th:text="${user.email}"></td>
-                                            <td><th:block th:each="role : ${user.roles}"><span th:text="${role}"> </span> </span></th:block></td>
-                                            <td><button class="button button1" th:data-id="${user.getId()}" th:data-username="${user.getUsername()}"th:data-firstname="${user.getFirstName()}" th:data-lastname="${user.getLastName()}" th:data-email="${user.getEmail()}" th:data-roles="${user.getRoles()}" data-bs-toggle="modal" data-bs-target="#editModal">Edit</button></td>
-                                            <td><button th:href="@{admin/delete?id={id}(id=${user.getId()})}"  class="button button2" th:data-id="${user.getId()}" th:data-username="${user.getUsername()}" th:data-firstname="${user.getFirstName()}" th:data-lastname="${user.getLastName()}" th:data-email="${user.getEmail()}" th:data-roles="${user.getRoles()}" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</button></td>
-                                        </tbody>
+                                        <tbody id="users-list"></tbody>
                                     </table>
                                     <!--/User Table-->
 
                                     <!-- Edit User Modal -->
                                     <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
-                                        <form class="container" th:method = "POST"
-                                              th:action = "@{/admin/change}"
-                                              th:object="${user}" style="width: 400px">
+
+                                        <form id="editForm" class="container" style="width: 400px">
+
                                             <div class="modal-dialog" role="document">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
@@ -163,11 +145,9 @@
                                                         </br>
                                                         <div class="form-group">
                                                             <label class="d-flex justify-content-center" for="roleE" style="font-weight: bold">Role</label>
-                                                            <select multiple="multiple" th:name="roleSelectedID" class="form-control" id="roleE" style="height: 60px;" required>
-                                                                <option th:each="role:${allRoles}"
-                                                                        th:value="${role.getId()}"
-                                                                        th:text="${role}">
-                                                                </option>
+                                                            <select multiple="multiple" name="updatedRoles" class="form-control" id="roleE" style="height: 60px;">
+                                                                <option id="selectRoleUserE" value="user">user</option>
+                                                                <option id="selectRoleAdminE" value="admin">admin</option>
                                                             </select>
                                                         </div>
                                                     </div>
@@ -183,57 +163,61 @@
 
                                     <!-- Delete User Modal -->
                                     <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog" role="document">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="deleteModalLabel">Delete user</h5>
-                                                    <button type="button" class="close btn-close" data-bs-dismiss="modal" aria-label="Close">
-                                                        <span aria-hidden="true"></span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <form class="container" style="width: 400px">
-                                                        </br>
-                                                        <div class="form-group">
-                                                            <label class="d-flex justify-content-center" for="idD" style="font-weight: bold;">ID</label>
-                                                            <input type="text" class="form-control" id="idD" placeholder="id" readonly style="color: #636E7A; background-color: #E9ECEF">
-                                                        </div>
-                                                        </br>
-                                                        <div class="form-group">
-                                                            <label class="d-flex justify-content-center" for="usernameD" style="font-weight: bold">Login</label>
-                                                            <input type="text" class="form-control" id="usernameD" placeholder="username"readonly style="color: #636E7A; background-color: #E9ECEF">
-                                                        </div>
-                                                        </br>
-                                                        <div class="form-group">
-                                                            <label class="d-flex justify-content-center" for="firstNameD" style="font-weight: bold">First name</label>
-                                                            <input type="text" class="form-control" id="firstNameD" placeholder="username"readonly style="color: #636E7A; background-color: #E9ECEF">
-                                                        </div>
-                                                        </br>
-                                                        <div class="form-group">
-                                                            <label class="d-flex justify-content-center" for="lastNameD" style="font-weight: bold">Last name</label>
-                                                            <input type="text" class="form-control" id="lastNameD" placeholder="username"readonly style="color: #636E7A; background-color: #E9ECEF">
-                                                        </div>
-                                                        </br>
-                                                        <div class="form-group">
-                                                            <label class="d-flex justify-content-center" for="emailD" style="font-weight: bold">Email</label>
-                                                            <input type="email" class="form-control" id="emailD" placeholder="email" readonly style="color: #636E7A;background-color: #E9ECEF">
-                                                        </div>
-                                                        </br>
-                                                        <div class="form-group">
-                                                            <label class="d-flex justify-content-center" for="roleD" style="font-weight: bold">Role</label>
-                                                            <select multiple="multiple" name="roleSelectedID" th:name="roleSelectedID" class="form-control" id="roleD" style="height: 60px;">
-                                                                <option id="selectRoleUserD" th:value="user">user</option>
-                                                                <option id="selectRoleAdminD" th:value="admin">admin</option>
-                                                            </select>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                    <a href="" id="deleteConfirm" class="btn btn-danger">Delete</a>
+
+                                        <form id="deleteForm" class="container" style="width: 400px">
+
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="deleteModalLabel">Delete user</h5>
+                                                        <button type="button" class="close btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true"></span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form class="container" style="width: 400px">
+                                                            </br>
+                                                            <div class="form-group">
+                                                                <label class="d-flex justify-content-center" for="idD" style="font-weight: bold;">ID</label>
+                                                                <input type="text" class="form-control" id="idD" placeholder="id" readonly style="color: #636E7A; background-color: #E9ECEF">
+                                                            </div>
+                                                            </br>
+                                                            <div class="form-group">
+                                                                <label class="d-flex justify-content-center" for="loginD" style="font-weight: bold">Login</label>
+                                                                <input type="text" class="form-control" id="loginD" placeholder="username"readonly style="color: #636E7A; background-color: #E9ECEF">
+                                                            </div>
+                                                            </br>
+                                                            <div class="form-group">
+                                                                <label class="d-flex justify-content-center" for="firstNameD" style="font-weight: bold">First name</label>
+                                                                <input type="text" class="form-control" id="firstNameD" placeholder="username"readonly style="color: #636E7A; background-color: #E9ECEF">
+                                                            </div>
+                                                            </br>
+                                                            <div class="form-group">
+                                                                <label class="d-flex justify-content-center" for="lastNameD" style="font-weight: bold">Last name</label>
+                                                                <input type="text" class="form-control" id="lastNameD" placeholder="username"readonly style="color: #636E7A; background-color: #E9ECEF">
+                                                            </div>
+                                                            </br>
+                                                            <div class="form-group">
+                                                                <label class="d-flex justify-content-center" for="emailD" style="font-weight: bold">Email</label>
+                                                                <input type="email" class="form-control" id="emailD" placeholder="email" readonly style="color: #636E7A;background-color: #E9ECEF">
+                                                            </div>
+                                                            </br>
+                                                            <div class="form-group">
+                                                                <label class="d-flex justify-content-center" for="roleD" style="font-weight: bold">Role</label>
+                                                                <select multiple="multiple" name="roleDeletedUser" id="roleD" class="form-control" style="height: 60px;">
+                                                                    <option id="selectRoleUserD" th:value="user">user</option>
+                                                                    <option id="selectRoleAdminD" th:value="admin">admin</option>
+                                                                </select>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </form>
                                     </div>
                                     <!-- /Delete User Modal -->
 
@@ -245,45 +229,43 @@
                                 </div>
 
                                 <!--New User Form-->
-                                <form class="container need-validation" th:method="POST" th:action="@{/admin/new}" th:object="${user}" style="width: 400px">
+                                <form class="container need-validation" id="newUserForm"  style="width: 400px">
                                     </br>
                                     <div class="form-group">
-                                        <label class="d-flex justify-content-center" for="firstName" style="font-weight: bold">First name</label>
-                                        <input type="text" class="form-control" id="firstName" th:field="*{firstName}" placeholder="enter first name" required>
-                                        <div class="invalid-feedback" th:if ="${#fields.hasErrors('firstName')}" th:errors="*{firstName}" style="color:red">invalid first name</div>
+                                        <label class="d-flex justify-content-center" for="firstNameN" style="font-weight: bold">First name</label>
+                                        <input type="text" class="form-control" id="firstNameN" name="firstName" placeholder="enter first name" required>
+                                        <div class="invalid-feedback" style="color:red">invalid first name</div>
                                     </div>
                                     </br>
                                     <div class="form-group">
-                                        <label class="d-flex justify-content-center" for="lastName" style="font-weight: bold">Last name</label>
-                                        <input type="text" class="form-control" id="lastName" th:field="*{lastName}" placeholder="enter last name" required>
-                                        <div class="invalid-feedback" th:if ="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" style="color:red">invalid last name</div>
+                                        <label class="d-flex justify-content-center" for="lastNameN" style="font-weight: bold">Last name</label>
+                                        <input type="text" class="form-control" id="lastNameN" name="lastName" placeholder="enter last name" required>
+                                        <div class="invalid-feedback" style="color:red">invalid last name</div>
                                     </div>
                                     </br>
                                     <div class="form-group">
                                         <label class="d-flex justify-content-center" for="emailN" style="font-weight: bold">Email</label>
-                                        <input type="email" class="form-control" id="emailN" th:field="*{email}" placeholder="enter email" required>
-                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="color:red">invalid email</div>
+                                        <input type="email" class="form-control" id="emailN" name="email" placeholder="enter email" required>
+                                        <div class="invalid-feedback"  style="color:red">invalid email</div>
                                     </div>
                                     </br>
                                     <div class="form-group">
-                                        <label class="d-flex justify-content-center" for="login" style="font-weight: bold">Login</label>
-                                        <input type="text" class="form-control" id="login" th:field="*{login}" placeholder="enter login" required>
-                                        <div class="invalid-feedback" th:if ="${#fields.hasErrors('login')}" th:errors="*{login}" style="color:red">invalid login</div>
+                                        <label class="d-flex justify-content-center" for="loginN" style="font-weight: bold">Login</label>
+                                        <input type="text" class="form-control" id="loginN" name="login" placeholder="enter login" required>
+                                        <div class="invalid-feedback"  style="color:red">invalid login</div>
                                     </div>
                                     </br>
                                     <div class="form-group">
                                         <label class="d-flex justify-content-center" for="passwordN" style="font-weight: bold">Password</label>
-                                        <input type="password" class="form-control" id="passwordN" th:field="*{password}" placeholder="enter password" required>
-                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color:red">invalid password</div>
+                                        <input type="password" class="form-control" id="passwordN" name="password" placeholder="enter password" required>
+                                        <div class="invalid-feedback"  style="color:red">invalid password</div>
                                     </div>
                                     </br>
                                     <div class="form-group">
                                         <label class="d-flex justify-content-center" for="roleN" style="font-weight: bold">Role</label>
-                                        <select multiple="multiple" th:name="roles" class="form-control" id="roleN" style="height: 60px;" required>
-                                            <option th:each="role:${allRoles}"
-                                                    th:value="${role.getId()}"
-                                                    th:text="${role}">
-                                            </option>
+                                        <select multiple="multiple" name="newRoles" class="form-control" id="roleN" style="height: 60px;" required>
+                                            <option id="selectRoleUserN" value="user">user</option>
+                                            <option id="selectRoleAdminN" value="admin">admin</option>
                                         </select>
                                     </div>
                                     </br>
@@ -326,16 +308,7 @@
                                                 <th scope="col">Role</th>
                                             </tr>
                                             </thead>
-                                            <tbody>
-                                            <th:block><tr>
-                                                <td th:text="${signedUser.getId()}">id</td>
-                                                <td th:text="${signedUser.getUsername()}">username</td>
-                                                <td th:text="${signedUser.getFirstName()}">First name</td>
-                                                <td th:text="${signedUser.getLastName()}">Last name</td>
-                                                <td th:text="${signedUser.getEmail()}">email</td>
-                                                <td><th:block th:each="role:${signedUser.getRoles()}"><span th:text="${role}">role</span><span> </span></th:block></td>
-                                            </tr></th:block>
-                                            </tbody>
+                                            <tbody id="userInfo"></tbody>
                                         </table>
                                     </div>
                                 </div>
@@ -353,102 +326,7 @@
 </section>
 <!--main-->
 
-<!--DELETE BUTTON SCRIPT-->
-<script>
-    $('.button2').click(function () {
-        var $modal = $('#deleteModal')
-        var $btn = $(this);
-        $('#idD').val($btn.attr('data-id'));
-        $('#usernameD').val($btn.attr('data-username'));
-        $('#firstNameD').val($btn.attr('data-firstname'));
-        $('#lastNameD').val($btn.attr('data-lastname'));
-        $('#emailD').val($btn.attr('data-email'));
-        var roles = $btn.attr('data-roles');
-        if (roles.includes("user")) {
-            $('#selectRoleUserD').attr('selected', "selected")
-        } else {
-            $('#selectRoleUserD').attr('selected', false)
-        }
-        if (roles.includes("admin")) {
-            $('#selectRoleAdminD').attr('selected', "selected");
-        } else {
-            $('#selectRoleAdminD').attr('selected', false)
-        }
-    });
-</script>
-<!--/DELETE BUTTON SCRIPT-->
-
-
-<!--EDIT BUTTON SCRIPT-->
-<script>
-    $('.button1').on('click',function () {
-        var $btn = $(this);
-        var href = $btn.attr('href');
-        $('#idE').val($btn.attr('data-id'));
-        $('#loginE').val($btn.attr('data-username'));
-        $('#firstNameE').val($btn.attr('data-firstname'));
-        $('#lastNameE').val($btn.attr('data-lastname'));
-        $('#emailE').val($btn.attr('data-email'));
-        var roles = $btn.attr('data-roles');
-        if (roles.includes("user")) {
-            $('#selectRoleUserE').attr('selected', "selected")
-        } else {
-            $('#selectRoleUserE').attr('selected', false)
-        }
-        if (roles.includes("admin")) {
-            $('#selectRoleAdminE').attr('selected', "selected");
-        } else {
-            $('#selectRoleAdminE').attr('selected', false)
-        }
-    });
-</script>
-<!--/EDIT BUTTON SCRIPT-->
-
-</body>
-</html>
-
-<body>
-<br/>
-<form  th:method = "GET" th:action="@{/logout}">
-    <input type="submit" value="LOGOUT" />
-</form>
-<br/>
-<table>
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Login</th>
-        <th>First Name</th>
-        <th>Last Name</th>
-        <th>Email</th>
-        <th>Role</th>
-        <th>Delete user</th>
-        <th>Change user`s data</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="user : ${allUsers}">
-        <td th:text="${user.id}"></td>
-        <td th:text="${user.login}"></td>
-        <td th:text="${user.firstName}"></td>
-        <td th:text="${user.lastName}"></td>
-        <td th:text="${user.email}"></td>
-        <td>
-            <span th:each="role : ${user.roles}">
-                <p th:text="${role}"></p>
-            </span>
-        </td>
-        <td> <a th:href="@{/admin/delete?id={id}(id=${user.id})}" th:text ="Delete"></a>
-        <td> <a th:href="@{/admin/change?id={id}(id=${user.id})}" th:text ="Change"></a>
-        </td>
-    </tr>
-    </tbody>
-</table>
-<br/>
-<form  th:method = "GET" th:action="@{/admin/new}">
-    <input type="submit" value="Add user" />
-</form>
-<br/>
+<script type="text/javascript" src="admin.js" th:src="@{admin.js}"></script>
 
 </body>
 </html>

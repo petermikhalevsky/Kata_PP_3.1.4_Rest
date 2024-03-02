@@ -31,16 +31,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/start","/addFirsAdmin","/login")
-                .permitAll()
+                .antMatchers("/login", "/error").permitAll()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/admin","/admin/addForm","/admin/changeForm","/user").hasAuthority("admin")
-                .antMatchers("/user").hasAnyAuthority("user","admin")
-                .anyRequest().authenticated()
+                .antMatchers("/user").hasAnyAuthority("user", "admin")
+                .antMatchers("/admin","/users","/usersEdit").hasAuthority("admin")
+                .antMatchers("/user_panel").hasAuthority("user")
+                .anyRequest().hasAnyAuthority("user", "admin")
                 .and()
-                .formLogin().successHandler(successUserHandler)
+                .formLogin()
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
+                .successHandler(successUserHandler)
                 .permitAll()
                 .and()
                 .logout()
@@ -58,7 +62,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public static PasswordEncoder passwordEncoder() {
-        //return NoOpPasswordEncoder.getInstance();
         return new BCryptPasswordEncoder();
     }
 
@@ -67,17 +70,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return NoOpPasswordEncoder.getInstance();
     }
 
-    // аутентификация inMemory
-    @Bean
-    @Override
-    public UserDetailsService userDetailsService() {
-        UserDetails user =
-                User.withDefaultPasswordEncoder()
-                        .username("user")
-                        .password("user")
-                        .roles("USER")
-                        .build();
-
-        return new InMemoryUserDetailsManager(user);
-    }
 }
