@@ -73,7 +73,17 @@ public class UserRestController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         System.out.println("authentication =" + authentication);
         User user = (User) authentication.getPrincipal();
-        System.out.println("Principal =" + user);
+        System.out.println("Principal = " + user);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @GetMapping("/admin")
+    public ResponseEntity<User> getCurrentAdmin(Principal principal){
+        System.out.println("start @GetMapping(\"/admin\")");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("authentication =" + authentication);
+        User user = (User) authentication.getPrincipal();
+        System.out.println("Principal = " + user);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
